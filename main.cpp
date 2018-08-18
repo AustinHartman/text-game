@@ -17,6 +17,11 @@ using namespace std;
 
 WINDOW* init();
 bool collision(GameObject i, GameObject j);
+void endGameScreen(bool lost, int score);
+void exitGame(WINDOW *endScreen, int score);
+void lostGame(WINDOW *endScreen, int score);
+bool move(void);
+bool mainMenu();
 
 int main() {
   bool gameOver = false;
@@ -25,15 +30,11 @@ int main() {
   int reload_count = 1000;
   int b_clock=0;
   int e_clock=0;
-
   int xMax, yMax;
 
   // init ncurses
   WINDOW *win = init();
-  void endGameScreen(bool lost, int score);
-  void exitGame(WINDOW *endScreen, int score);
-  void lostGame(WINDOW *endScreen, int score);
-  bool move(void);
+  gameOver = mainMenu();
   getmaxyx(win, yMax, xMax);
   refresh();
 
@@ -100,13 +101,59 @@ int main() {
     reload_count++;
   }
 
-  wclear(win);
-  wrefresh(win);
+  delwin(win);
+  //wrefresh(win);
 
   // display end endScreen
   endGameScreen(lost, score);
 
   return 0;
+}
+
+bool mainMenu() {
+
+  WINDOW *menuScreen = newwin(32, 64, 0, 0);
+  wrefresh(menuScreen);
+  wtimeout(menuScreen, 1);
+
+  bool onMenu = true;
+  bool play = true;
+  int c;
+
+  do {
+    c = wgetch(menuScreen);
+    if (c == 'w') play = true;
+    else if (c == 's') play = false;
+    else if (c == '\n') {
+      onMenu = false;
+      delwin(menuScreen);
+      return (play) ? false : true;
+    }
+
+    wattron(menuScreen, COLOR_PAIR(END_PAIR));
+    mvwprintw(menuScreen, 16, 32, "MAIN MENU");
+    wattroff(menuScreen, COLOR_PAIR(END_PAIR));
+
+    if (play) {
+      wattron(menuScreen, COLOR_PAIR(END_PAIR));
+      mvwprintw(menuScreen, 18, 32, "Play");
+      wattroff(menuScreen, COLOR_PAIR(END_PAIR));
+
+      wattron(menuScreen, COLOR_PAIR(ENEMY_PAIR));
+      mvwprintw(menuScreen, 20, 32, "Exit");
+      wattroff(menuScreen, COLOR_PAIR(ENEMY_PAIR));
+    } else {
+      wattron(menuScreen, COLOR_PAIR(ENEMY_PAIR));
+      mvwprintw(menuScreen, 18, 32, "Play");
+      wattroff(menuScreen, COLOR_PAIR(ENEMY_PAIR));
+
+      wattron(menuScreen, COLOR_PAIR(END_PAIR));
+      mvwprintw(menuScreen, 20, 32, "Exit");
+      wattroff(menuScreen, COLOR_PAIR(END_PAIR));
+    }
+    wtimeout(menuScreen, 1);
+    wrefresh(menuScreen);
+  } while (onMenu);
 }
 
 WINDOW* init() {
