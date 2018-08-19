@@ -187,37 +187,38 @@ bool collision(GameObject i, GameObject j) {
 bool move(void) { return (bool)(rand() % 2); }
 
 void exitGame(WINDOW *endScreen, int score) {
-  mvwprintw(endScreen, 4, 33, "                     ");
   mvwprintw(endScreen, 5, 32, "    ---------------    ");
   mvwprintw(endScreen, 6, 40, "Score: %d", score);
   mvwprintw(endScreen, 7, 32, "    ---------------    ");
-  mvwprintw(endScreen, 8, 33, "                     ");
+
+  wattron(endScreen, COLOR_PAIR(END_PAIR));
   mvwprintw(endScreen, 14, 33, "                     ");
   mvwprintw(endScreen, 15, 32, "    ---------------    ");
   mvwprintw(endScreen, 16, 32, "    |  EXIT GAME  |    ");
   mvwprintw(endScreen, 17, 32, "    ---------------    ");
   mvwprintw(endScreen, 18, 33, "                     ");
+  wattroff(endScreen, COLOR_PAIR(1));
 }
 
 void lostGame(WINDOW *endScreen, int score) {
-  mvwprintw(endScreen, 4, 33, "                     ");
   mvwprintw(endScreen, 5, 32, "    ---------------    ");
   mvwprintw(endScreen, 6, 40, "Score: %d", score);
   mvwprintw(endScreen, 7, 32, "    ---------------    ");
-  mvwprintw(endScreen, 8, 33, "                     ");
+
+  wattron(endScreen, COLOR_PAIR(END_PAIR));
   mvwprintw(endScreen, 14, 33, "                     ");
   mvwprintw(endScreen, 15, 32, "    ---------------    ");
   mvwprintw(endScreen, 16, 32, "    |  Lost Game  |    ");
   mvwprintw(endScreen, 17, 32, "    ---------------    ");
   mvwprintw(endScreen, 18, 33, "                     ");
+  wattroff(endScreen, COLOR_PAIR(1));
 }
 
 void endGameScreen(bool lost, int score) {
   WINDOW *endScreen = newwin(32, 64, 0, 0);
 
-  wattron(endScreen, COLOR_PAIR(END_PAIR));
   lost ? lostGame(endScreen, score) : exitGame(endScreen, score);
-  wattroff(endScreen, COLOR_PAIR(1));
+
   wtimeout(endScreen, 1);
   wrefresh(endScreen);
 
