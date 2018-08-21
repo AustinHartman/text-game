@@ -5,13 +5,13 @@ Bullet::Bullet(WINDOW *w, char c, int color) : GameObject(w, c, color) {
   active = true;
   fired = false;
 }
-/*
+
 Bullet::Bullet(WINDOW *win, char c, int y, int x, int d, int color) : GameObject(win, c, color) {
   yLoc = y;
   xLoc = x;
   dir = d;
 }
-*/
+
 int Bullet::getDir() { return dir; }
 
 bool Bullet::getFired() { return fired; }
