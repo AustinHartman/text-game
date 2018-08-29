@@ -10,6 +10,8 @@ class Player : public GameObject {
     void update(int choice);
     int getDir();
 
+    void setBounds(int xMax, int xMin, int yMax, int yMin);
+
   private:
     int dir;
 };

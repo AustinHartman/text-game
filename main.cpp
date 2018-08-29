@@ -70,6 +70,7 @@ int main() {
 
     s.update(p.getX(), p.getY(), p.getDir());
 
+    // can alter reload time for bullet
     if (b_clock > 10)
     {
       b_clock = 0;
@@ -82,10 +83,21 @@ int main() {
     for (int i=0; i<enemies.size(); ++i) enemies[i].display();
 
     wattron(win, COLOR_PAIR(SCORE_PAIR));
-    mvwprintw(win, 1, 30, "Score: %d", score);
+    mvwprintw(win, 1, 5, "Score: %d", score);
     wattroff(win, COLOR_PAIR(SCORE_PAIR));
 
-    if (collision(p, s)) s.setActive(true), b.setActive(false);
+    wattron(win, COLOR_PAIR(CONTROL_PAIR));
+    mvwprintw(win, 1, 25, " Move: wasd");
+    mvwprintw(win, 2, 25, " Shoot: p  ");
+    mvwprintw(win, 1, 48, " Exit: x ");
+    wattroff(win, COLOR_PAIR(CONTROL_PAIR));
+
+    // set saber to active and change bounds so saber stays in bounds
+    if (collision(p, s)) {
+      p.setBounds(xMax-1, 3, yMax-1, 6);
+      s.setActive(true);
+      b.setActive(false);      // once saber is picked up, gun is inactive
+    }
 
     // collision detection
     for (int i=0; i<enemies.size(); ++i) {
@@ -101,8 +113,8 @@ int main() {
     reload_count++;
   }
 
+  // erase window from mem
   delwin(win);
-  //wrefresh(win);
 
   // display end endScreen
   endGameScreen(lost, score);
@@ -168,6 +180,7 @@ WINDOW* init() {
   init_pair(PLAYER_PAIR, COLOR_YELLOW, COLOR_BLACK);
   init_pair(ENEMY_PAIR, COLOR_RED, COLOR_BLACK);
   init_pair(END_PAIR, COLOR_BLACK, COLOR_RED);
+  init_pair(CONTROL_PAIR, COLOR_BLACK, COLOR_WHITE);
 
   wtimeout(win, 1);
   //wrefresh(win);
