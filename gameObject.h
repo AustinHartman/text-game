@@ -14,6 +14,8 @@ class GameObject {
     void setX(int x);
     void setY(int y);
 
+    void setChar(char c);
+
     void display();
 
   protected:

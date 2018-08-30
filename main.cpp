@@ -26,6 +26,7 @@ bool mainMenu();
 int main() {
   bool gameOver = false;
   bool lost = false;
+  bool saberFound = false;
   int score = 0;
   int reload_count = 1000;
   int b_clock=0;
@@ -57,10 +58,25 @@ int main() {
 
     // update if relevant
     if (c!=ERR) p.update(c);
-    if (c == 'x') gameOver = true;
-    if (c == 'p' and b.getActive() and !b.getFired() and reload_count > 400) b.setFired(true), reload_count=0, b.setX(p.getX()), b.setY(p.getY()), b.setDir(p.getDir());
+    if      (c == 'x') gameOver = true;
+    else if (c == 'p' and b.getActive() and !b.getFired() and reload_count > 400) b.setFired(true), reload_count=0, b.setX(p.getX()), b.setY(p.getY()), b.setDir(p.getDir());
+    // weapon change
+    else if (saberFound and c == 'c') {
+      if (b.getActive() and p.getX()<xMax-2 and p.getX()>1 and p.getY()<yMax-2 and p.getY()>4) {
+        b.setActive(false);
+        s.setActive(true);
+        s.setChar('/');
+        p.setBounds(xMax-1, 3, yMax-1, 6);
+      }
+      else {
+        b.setActive(true);
+        s.setActive(false);
+        s.setChar(' ');
+        p.setBounds(xMax, 2, yMax, 5);
+      }
+    }
 
-    if (e_clock > 100-score)
+    if (e_clock > 100-score)     // enemies speed up as score goes up
     {
       e_clock = 0;
       for (int i=0; i<enemies.size(); ++i) {
@@ -77,9 +93,11 @@ int main() {
       b.update();
     }
 
+    // display objects
+    s.display();            // should be displayed first bc saber is whitespace when unweilded
     p.display();
     b.display();
-    s.display();
+
     for (int i=0; i<enemies.size(); ++i) enemies[i].display();
 
     wattron(win, COLOR_PAIR(SCORE_PAIR));
@@ -89,11 +107,13 @@ int main() {
     wattron(win, COLOR_PAIR(CONTROL_PAIR));
     mvwprintw(win, 1, 25, " Move: wasd");
     mvwprintw(win, 2, 25, " Shoot: p  ");
-    mvwprintw(win, 1, 48, " Exit: x ");
+    mvwprintw(win, 1, 45, " Exit: x        ");
+    mvwprintw(win, 2, 45, " Swap weapon: c ");
     wattroff(win, COLOR_PAIR(CONTROL_PAIR));
 
     // set saber to active and change bounds so saber stays in bounds
-    if (collision(p, s)) {
+    if (!saberFound && collision(p, s)) {
+      saberFound = true;
       p.setBounds(xMax-1, 3, yMax-1, 6);
       s.setActive(true);
       b.setActive(false);      // once saber is picked up, gun is inactive
@@ -103,7 +123,7 @@ int main() {
     for (int i=0; i<enemies.size(); ++i) {
       if (collision(enemies[i], b)) score++, enemies[i].spawn(), b.setFired(false);
       if (collision(enemies[i], p)) gameOver=true, lost=true;
-      if (collision(enemies[i], s)) score++, enemies[i].spawn();
+      if (collision(enemies[i], s) && s.getActive()) score++, enemies[i].spawn();
     }
 
     wrefresh(win);

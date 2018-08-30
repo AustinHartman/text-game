@@ -34,6 +34,8 @@ int GameObject::getX() { return xLoc; }
 
 int GameObject::getY() { return yLoc; }
 
+void GameObject::setChar(char c) { character = c; }
+
 void GameObject::display() {
   mvwaddch(curwin, prevY, prevX, ' ');
   wattron(curwin, COLOR_PAIR(print_color));
