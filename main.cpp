@@ -5,6 +5,8 @@
 #include <iostream>
 #include <vector>
 #include <unistd.h>
+#include <sstream>
+#include <fstream>
 
 #include "gameObject.h"
 #include "player.h"
@@ -22,12 +24,17 @@ void exitGame(WINDOW *endScreen, int score);
 void lostGame(WINDOW *endScreen, int score);
 bool move(void);
 bool mainMenu();
+int getHighscore(string file);
+void clearFile(string filename);
+void updateHighscore(string file, int score);
+
 
 int main() {
   bool gameOver = false;
   bool lost = false;
   bool saberFound = false;
   int score = 0;
+  int hs = getHighscore("highscore.txt");
   int reload_count = 1000;
   int b_clock=0;
   int e_clock=0;
@@ -57,7 +64,6 @@ int main() {
     c = wgetch(win);
 
     // update if relevant
-    if (c!=ERR) p.update(c);
     if      (c == 'x') gameOver = true;
     else if (c == 'p' and b.getActive() and !b.getFired() and reload_count > 400) b.setFired(true), reload_count=0, b.setX(p.getX()), b.setY(p.getY()), b.setDir(p.getDir());
     // weapon change
@@ -84,6 +90,7 @@ int main() {
       }
     }
 
+    p.update(c);
     s.update(p.getX(), p.getY(), p.getDir());
 
     // can alter reload time for bullet
@@ -102,6 +109,7 @@ int main() {
 
     wattron(win, COLOR_PAIR(SCORE_PAIR));
     mvwprintw(win, 1, 5, "Score: %d", score);
+    mvwprintw(win, 2, 5, "Highscore: %d", hs);
     wattroff(win, COLOR_PAIR(SCORE_PAIR));
 
     wattron(win, COLOR_PAIR(CONTROL_PAIR));
@@ -139,7 +147,46 @@ int main() {
   // display end endScreen
   endGameScreen(lost, score);
 
+  // update highscore
+  updateHighscore("highscore.txt", score);
+
   return 0;
+}
+
+int getHighscore(string filename) {
+  string line;
+  string hs_str;
+  ifstream file (filename);
+  if (file.is_open()) {
+    while ( getline (file, line) ) hs_str = line;
+    file.close();
+  }
+
+  // convert str to int
+  stringstream conv((hs_str));
+  int hs;
+  conv >> hs;
+
+  return hs;
+}
+
+void clearFile(string filename) {
+  ofstream ofs;
+  ofs.open(filename, std::ofstream::out | std::ofstream::trunc);
+  ofs.close();
+}
+
+void updateHighscore(string filename, int score) {
+  int current_hs = getHighscore(filename);
+  if (score > current_hs) {
+    clearFile(filename);
+
+    ofstream file;
+    file.open(filename);
+    string s = to_string(score);
+    file << score << "\n";
+    file.close();
+  }
 }
 
 bool mainMenu() {
@@ -203,7 +250,6 @@ WINDOW* init() {
   init_pair(CONTROL_PAIR, COLOR_BLACK, COLOR_WHITE);
 
   wtimeout(win, 1);
-  //wrefresh(win);
   box(win, 0, 0);
   mvwhline(win, 3, 1, 0, 62);
 
