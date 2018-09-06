@@ -10,3 +10,5 @@ const int CONTROL_PAIR = 6;
 const char ENEMY_CHAR =  '?';
 const char PLAYER_CHAR = '@';
 const char BULLET_CHAR = '*';
+
+const int GRASS_COUNT = 10;

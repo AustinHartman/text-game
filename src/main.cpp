@@ -51,6 +51,11 @@ int main() {
   Bullet b(win, '*', BULLET_PAIR);
   Saber s(win, '/',  PLAYER_PAIR);
 
+  // init grass objects
+  vector<GameObject> grass;
+  grass.reserve(GRASS_COUNT);
+  for (int i=0; i<GRASS_COUNT; ++i) grass.push_back(GameObject(win, '^', SCORE_PAIR, rand() % (xMax) + 1, rand() % (yMax-5) + 4));
+
   // init array of enemies
   vector<Enemy> enemies;
   enemies.reserve(5);
@@ -106,6 +111,8 @@ int main() {
     b.display();
 
     for (int i=0; i<enemies.size(); ++i) enemies[i].display();
+    for (int i=0; i<grass.size(); ++i) grass[i].display();
+
 
     wattron(win, COLOR_PAIR(SCORE_PAIR));
     mvwprintw(win, 1, 5, "Score: %d", score);
@@ -233,6 +240,9 @@ bool mainMenu() {
     wtimeout(menuScreen, 1);
     wrefresh(menuScreen);
   } while (onMenu);
+
+  // probably will never reach here, but will remove compiler warning
+  return false;
 }
 
 WINDOW* init() {
